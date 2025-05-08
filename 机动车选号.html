@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>新能源车牌选号系统</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        #plates-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .plate {
+            background: linear-gradient(to right, #4CAF50, #45a049);
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            font-family: '黑体', sans-serif;
+            font-size: 1.3em;
+            white-space: nowrap;
+        }
+        .selected {
+            border-color: #ffeb3b;
+            box-shadow: 0 0 10px rgba(255, 235, 59, 0.5);
+        }
+        #controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 0 0 20px 0;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 1.3em;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #selected-plate {
+            text-align: center;
+            font-size: 1.4em;
+            margin: 20px 0;
+        }
+        #confirm-btn {
+            background: #4CAF50;
+        }
+        /* 新增的作者名字样式 */
+        #author {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            color: white; /* 将字体颜色改为白色 */
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <button onclick="toggleRoll()">开始选号</button>
+        <button id="confirm-btn" onclick="confirmSelection()">确认选号</button>
+    </div>
+    <div id="plates-grid"></div>
+    <div id="selected-plate">已选中：无</div>
+
+    <script>
+        let isRolling = false;
+        let rollInterval = null;
+        const validLetters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+
+        function generatePlates() {
+            const grid = document.getElementById('plates-grid');
+            grid.innerHTML = '';
+            
+            for(let i = 0; i < 25; i++) {
+                const letters = Array.from({length: 2}, () => 
+                    validLetters[Math.floor(Math.random() * validLetters.length)]
+                ).join('');
+                const numbers = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+                
+                const plate = document.createElement('div');
+                plate.className = 'plate';
+                plate.textContent = `浙A·D${letters}${numbers}`;
+                
+                plate.onclick = function() {
+                    document.querySelectorAll('.plate').forEach(p => p.classList.remove('selected'));
+                    this.classList.add('selected');
+                    document.getElementById('selected-plate').textContent = `已选中：${this.textContent}`;
+                };
+                grid.appendChild(plate);
+            }
+        }
+
+        function toggleRoll() {
+            const btn = document.querySelector('#controls button:first-child');
+            if (!isRolling) {
+                generatePlates();
+                rollInterval = setInterval(generatePlates, 50);
+                btn.textContent = '停止滚动';
+            } else {
+                clearInterval(rollInterval);
+                btn.textContent = '开始选号';
+            }
+            isRolling = !isRolling;
+        }
+
+        function confirmSelection() {
+            const selected = document.querySelector('.selected');
+            if (selected) {
+                alert(`选号完成！\n您选择的车牌是：${selected.textContent}`);
+            } else {
+                alert('请先选择一个车牌号码！');
+            }
+        }
+
+        // 初始化生成
+        generatePlates();
+    </script>
+    <div id="author">通信攻城狮</div>
+</body>
+</html>
